@@ -54,17 +54,20 @@ Preferred communication style: Simple, everyday language.
    - Single-page interface for user input
    - Bootstrap-based responsive design
    - Form validation and user feedback elements
+   - Guided reflection prompts interface
 
 2. **Styling** (`static/css/style.css`)
    - Custom CSS for enhanced user experience
    - Smooth transitions and hover effects
    - Form enhancements and loading animations
+   - Guided prompts button styling and animations
 
 3. **JavaScript** (`static/js/app.js`)
    - Form submission handling
    - AJAX API communication
    - User interface state management
    - Input validation and character counting
+   - Guided reflection prompts functionality
 
 ## Data Flow
 
@@ -139,3 +142,7 @@ The application is designed as a supportive tool for spiritual self-reflection, 
 - **Public WiFi Support**: Specific error handling for public networks (Penny, cafés) with helpful warnings
 - **Offline Detection**: Real-time network status monitoring with user-friendly error messages
 - **Progressive Timeouts**: Increased timeout to 45 seconds with progressive retry delays
+- **Guided Reflection Prompts**: Interactive selection of character defects with targeted reflection questions
+- **Character Defect Focus**: Six main defects covered - pride, resentment, fear, control, jealousy, dishonesty
+- **Prompt Integration**: Questions can be automatically transferred to text input for structured reflection
+- **Visual Feedback**: Animated buttons and smooth transitions for better user experience

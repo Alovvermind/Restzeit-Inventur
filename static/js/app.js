@@ -24,6 +24,115 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('offline', updateNetworkStatus);
     updateNetworkStatus(); // Initial check
 
+    // Guided reflection prompts
+    const reflectionPrompts = {
+        pride: {
+            title: "Stolz",
+            questions: [
+                "Wann habe ich mich heute oder in letzter Zeit überlegen oder besser als andere gefühlt?",
+                "In welchen Situationen möchte ich unbedingt recht haben oder das letzte Wort haben?",
+                "Wo fällt es mir schwer, Fehler zuzugeben oder um Hilfe zu bitten?",
+                "Welche Komplimente oder Anerkennung brauche ich, um mich gut zu fühlen?"
+            ]
+        },
+        resentment: {
+            title: "Groll",
+            questions: [
+                "Gegen wen oder was hege ich Groll und warum?",
+                "Welche alten Verletzungen trage ich noch in mir?",
+                "Wann denke ich an vergangene Ungerechtigkeiten und ärgere mich darüber?",
+                "Wie beeinflusst dieser Groll mein heutiges Verhalten und meine Beziehungen?"
+            ]
+        },
+        fear: {
+            title: "Angst",
+            questions: [
+                "Wovor habe ich am meisten Angst und wie zeigt sich das in meinem Verhalten?",
+                "Welche Entscheidungen treffe ich aus Angst statt aus Vertrauen?",
+                "Wie hindert mich die Angst daran, authentisch zu sein?",
+                "Welche Zukunftssorgen beschäftigen mich am meisten?"
+            ]
+        },
+        control: {
+            title: "Kontrolle",
+            questions: [
+                "Wo versuche ich, andere Menschen oder Situationen zu kontrollieren?",
+                "Wie reagiere ich, wenn die Dinge nicht nach meinem Plan laufen?",
+                "Welche Bereiche meines Lebens kann ich schwer loslassen?",
+                "Wann fällt es mir schwer, anderen zu vertrauen oder Verantwortung abzugeben?"
+            ]
+        },
+        jealousy: {
+            title: "Eifersucht",
+            questions: [
+                "Auf wen oder was bin ich eifersüchtig und warum?",
+                "Welche Erfolge oder Besitztümer anderer lösen Neid in mir aus?",
+                "Wie zeigt sich meine Eifersucht in meinen Beziehungen?",
+                "Was fehlt mir, dass ich mich durch andere bedroht fühle?"
+            ]
+        },
+        dishonesty: {
+            title: "Unehrlichkeit",
+            questions: [
+                "Wo bin ich nicht ehrlich zu mir selbst oder anderen?",
+                "Welche kleinen Lügen oder Ausreden verwende ich regelmäßig?",
+                "Wo verschweige ich wichtige Dinge oder gebe mich anders, als ich bin?",
+                "Welche Wahrheiten fällt es mir schwer auszusprechen?"
+            ]
+        }
+    };
+
+    // Add event listeners for defect buttons
+    document.querySelectorAll('.defect-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const defect = this.dataset.defect;
+            showGuidedPrompts(defect);
+        });
+    });
+
+    function showGuidedPrompts(defect) {
+        const prompt = reflectionPrompts[defect];
+        const guidedPromptsDiv = document.getElementById('guidedPrompts');
+        const promptQuestions = document.getElementById('promptQuestions');
+        
+        // Update active button state
+        document.querySelectorAll('.defect-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`[data-defect="${defect}"]`).classList.add('active');
+        
+        // Create questions HTML
+        let questionsHTML = `<p class="fw-bold mb-2">${prompt.title}:</p><ul class="mb-0">`;
+        prompt.questions.forEach(question => {
+            questionsHTML += `<li class="mb-1">${question}</li>`;
+        });
+        questionsHTML += '</ul>';
+        
+        promptQuestions.innerHTML = questionsHTML;
+        guidedPromptsDiv.style.display = 'block';
+        
+        // Store current defect for use in useGuidedPrompt
+        window.currentDefect = defect;
+    }
+
+    window.useGuidedPrompt = function() {
+        const defect = window.currentDefect;
+        const prompt = reflectionPrompts[defect];
+        
+        let guidedText = `Charakterdefizit: ${prompt.title}\n\n`;
+        guidedText += "Reflexionsfragen:\n";
+        prompt.questions.forEach((question, index) => {
+            guidedText += `${index + 1}. ${question}\n\n`;
+        });
+        guidedText += "Meine Antworten:\n";
+        
+        textArea.value = guidedText;
+        textArea.style.height = 'auto';
+        textArea.style.height = (textArea.scrollHeight) + 'px';
+        textArea.focus();
+        
+        // Scroll to textarea
+        textArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
     // Form submission handler
     form.addEventListener('submit', function(e) {
         e.preventDefault();

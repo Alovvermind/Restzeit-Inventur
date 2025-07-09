@@ -34,6 +34,58 @@
         <!-- Main Content -->
         <div class="row justify-content-center">
             <div class="col-md-10 col-lg-8">
+                <!-- Guided Prompts Section -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-compass me-2"></i>
+                            Geführte Reflexion
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">Wählen Sie ein Charakterdefizit aus, um gezielte Reflexionsfragen zu erhalten:</p>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-info w-100 defect-btn" data-defect="pride">
+                                    <i class="fas fa-crown me-2"></i>Stolz
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-danger w-100 defect-btn" data-defect="resentment">
+                                    <i class="fas fa-fire me-2"></i>Groll
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-warning w-100 defect-btn" data-defect="fear">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Angst
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-success w-100 defect-btn" data-defect="control">
+                                    <i class="fas fa-hand-paper me-2"></i>Kontrolle
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-secondary w-100 defect-btn" data-defect="jealousy">
+                                    <i class="fas fa-heart-broken me-2"></i>Eifersucht
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-primary w-100 defect-btn" data-defect="dishonesty">
+                                    <i class="fas fa-mask me-2"></i>Unehrlichkeit
+                                </button>
+                            </div>
+                        </div>
+                        <div id="guidedPrompts" class="alert alert-light" style="display: none;">
+                            <h6 class="mb-3"><i class="fas fa-question-circle me-2"></i>Reflexionsfragen:</h6>
+                            <div id="promptQuestions"></div>
+                            <button class="btn btn-sm btn-outline-primary mt-2" onclick="useGuidedPrompt()">
+                                <i class="fas fa-arrow-down me-1"></i>In Textfeld übernehmen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Input Section -->
                 <div class="card mb-4">
                     <div class="card-header">
