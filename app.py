@@ -19,7 +19,8 @@ DEBUG_MODE = ENVIRONMENT == "development"
 class Base(DeclarativeBase):
     pass
 
-db = SQLAlchemy(model_class=Base)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "fallback-secret-key")
