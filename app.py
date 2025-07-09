@@ -1,9 +1,12 @@
 import os
 import logging
-from flask import Flask, request, jsonify, render_template
+from datetime import datetime
+from flask import Flask, request, jsonify, render_template, session
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
 from google import genai
 from google.genai import types
+from sqlalchemy.orm import DeclarativeBase
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -12,8 +15,29 @@ logging.basicConfig(level=logging.DEBUG)
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
 DEBUG_MODE = ENVIRONMENT == "development"
 
+# Database setup
+class Base(DeclarativeBase):
+    pass
+
+db = SQLAlchemy(model_class=Base)
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "fallback-secret-key")
+
+# Configure database
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Initialize database
+db.init_app(app)
+
+# Initialize models
+from models import create_models
+ReflectionSession, AppUsage = create_models(db)
 
 # Configure CORS for all domains to allow public access
 CORS(app, resources={
@@ -27,6 +51,11 @@ CORS(app, resources={
 
 # Initialize Gemini client
 client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", "your-api-key-here"))
+
+# Create database tables
+with app.app_context():
+    db.create_all()
+    logging.info("Database tables created")
 
 @app.route("/")
 def index():
@@ -79,6 +108,23 @@ def analyse():
         )
 
         if response.text:
+            # Save successful analysis to database
+            try:
+                reflection = ReflectionSession(
+                    user_text=user_text,
+                    ai_analysis=response.text,
+                    user_ip=request.remote_addr,
+                    user_agent=request.headers.get('User-Agent', ''),
+                    session_id=session.get('session_id', ''),
+                    is_successful=True
+                )
+                db.session.add(reflection)
+                db.session.commit()
+                logging.info(f"Saved reflection session {reflection.id}")
+            except Exception as db_error:
+                logging.error(f"Database error: {str(db_error)}")
+                # Continue despite database error
+            
             return jsonify({"antwort": response.text})
         else:
             return jsonify({"error": "Die Analyse konnte nicht durchgeführt werden. Bitte versuchen Sie es erneut."}), 500
@@ -92,6 +138,50 @@ def analyse():
         elif "timeout" in str(e).lower():
             error_message = "Die Anfrage dauerte zu lange. Bitte versuchen Sie es erneut."
         return jsonify({"error": error_message}), 500
+
+@app.route("/admin/stats")
+def admin_stats():
+    """Admin endpoint to view application statistics."""
+    try:
+        total_sessions = ReflectionSession.query.count()
+        successful_sessions = ReflectionSession.query.filter_by(is_successful=True).count()
+        failed_sessions = total_sessions - successful_sessions
+        
+        recent_sessions = ReflectionSession.query.order_by(ReflectionSession.timestamp.desc()).limit(10).all()
+        
+        stats = {
+            'total_sessions': total_sessions,
+            'successful_sessions': successful_sessions,
+            'failed_sessions': failed_sessions,
+            'recent_sessions': [session.to_dict() for session in recent_sessions]
+        }
+        
+        return jsonify(stats)
+    except Exception as e:
+        logging.error(f"Error fetching admin stats: {str(e)}")
+        return jsonify({"error": "Fehler beim Abrufen der Statistiken"}), 500
+
+@app.route("/history")
+def history():
+    """Get recent reflection sessions (limited for privacy)."""
+    try:
+        # Only return basic stats, not full text for privacy
+        recent_sessions = ReflectionSession.query.order_by(ReflectionSession.timestamp.desc()).limit(5).all()
+        sessions_data = []
+        
+        for session in recent_sessions:
+            sessions_data.append({
+                'id': session.id,
+                'timestamp': session.timestamp.isoformat(),
+                'text_length': len(session.user_text),
+                'analysis_length': len(session.ai_analysis),
+                'is_successful': session.is_successful
+            })
+        
+        return jsonify(sessions_data)
+    except Exception as e:
+        logging.error(f"Error fetching history: {str(e)}")
+        return jsonify({"error": "Fehler beim Abrufen der Historie"}), 500
 
 @app.errorhandler(404)
 def not_found(error):

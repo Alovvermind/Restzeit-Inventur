@@ -37,8 +37,15 @@ Preferred communication style: Simple, everyday language.
    - Main application logic
    - Route handlers for web pages and API endpoints
    - Gemini AI client initialization and configuration
+   - Database integration with PostgreSQL
+   - Session tracking and analytics endpoints
 
-2. **Main Entry Point** (`main.py`)
+2. **Database Models** (`models.py`)
+   - ReflectionSession model for storing user analyses
+   - AppUsage model for tracking application statistics
+   - Database schema and relationships
+
+3. **Main Entry Point** (`main.py`)
    - Application launcher
    - Development server configuration
 
@@ -66,7 +73,8 @@ Preferred communication style: Simple, everyday language.
 3. **API Request**: Frontend sends POST request to `/analyse` endpoint
 4. **AI Processing**: Backend sends structured prompt to Gemini AI
 5. **Response Processing**: AI analysis is formatted and returned
-6. **User Feedback**: Results displayed with spiritual guidance and daily recommendations
+6. **Database Storage**: Successful analyses are stored in PostgreSQL database
+7. **User Feedback**: Results displayed with spiritual guidance and daily recommendations
 
 ## External Dependencies
 
@@ -83,7 +91,9 @@ Preferred communication style: Simple, everyday language.
 ### Python Dependencies
 - **Flask**: Web application framework
 - **Flask-CORS**: Cross-origin resource sharing support
+- **Flask-SQLAlchemy**: Database ORM for PostgreSQL integration
 - **Google GenAI**: Official Google Gemini AI client library
+- **psycopg2-binary**: PostgreSQL adapter for Python
 
 ## Deployment Strategy
 
@@ -117,3 +127,7 @@ The application is designed as a supportive tool for spiritual self-reflection, 
 - **Network Robustness**: Improved timeout handling and more specific error messages
 - **Deployment Optimization**: Added environment-aware configuration for better public deployment
 - **Cross-Domain Compatibility**: Fixed JavaScript API calls to work with any domain (relative URLs)
+- **Database Integration**: Added PostgreSQL database with session tracking and analytics
+- **Data Persistence**: All successful analyses are now stored with timestamps and metadata
+- **Admin Analytics**: Added `/admin/stats` endpoint for monitoring application usage
+- **Privacy Protection**: History endpoint shows only basic stats without exposing user content
