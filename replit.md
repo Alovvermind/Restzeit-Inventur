@@ -146,3 +146,5 @@ The application is designed as a supportive tool for spiritual self-reflection, 
 - **Character Defect Focus**: Six main defects covered - pride, resentment, fear, control, jealousy, dishonesty
 - **Prompt Integration**: Questions can be automatically transferred to text input for structured reflection
 - **Visual Feedback**: Animated buttons and smooth transitions for better user experience
+- **Donation Integration**: Beautiful PayPal QR code section for user support with animated styling
+- **Mobile-Optimized Donations**: Responsive design optimized for mobile QR code scanning

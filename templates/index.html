@@ -161,8 +161,45 @@
             </div>
         </div>
 
-        <!-- Footer -->
+        <!-- Donation Section -->
         <div class="row justify-content-center mt-5">
+            <div class="col-md-10 col-lg-8">
+                <div class="card donation-card">
+                    <div class="card-header text-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-heart text-danger me-2"></i>
+                            Unterstützen Sie dieses Projekt
+                        </h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <p class="text-muted mb-4">
+                            Wenn Ihnen diese App bei Ihrer spirituellen Reise geholfen hat, können Sie den Entwickler gerne mit einer kleinen Spende unterstützen.
+                        </p>
+                        <div class="donation-qr-container">
+                            <img src="{{ url_for('static', filename='images/paypal_qr.jpg') }}" 
+                                 alt="PayPal Trinkgeld QR-Code" 
+                                 class="paypal-qr-code img-fluid">
+                            <div class="mt-3">
+                                <h6 class="text-info">Trinkgeldkasse</h6>
+                                <p class="small text-muted">
+                                    <i class="fas fa-mobile-alt me-1"></i>
+                                    QR-Code mit dem Handy scannen
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Ihre Spende hilft bei der Weiterentwicklung und dem Betrieb dieser App
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="row justify-content-center mt-4">
             <div class="col-md-10 col-lg-8">
                 <div class="text-center text-muted">
                     <small>
