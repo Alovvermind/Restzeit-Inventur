@@ -109,3 +109,11 @@ Preferred communication style: Simple, everyday language.
 ## Technical Notes
 
 The application is designed as a supportive tool for spiritual self-reflection, specifically targeting the 4th step of the AA program. The AI prompts are carefully crafted to provide compassionate yet honest feedback, focusing on character defects identification and practical daily spiritual recommendations. The entire user interface and AI interactions are conducted in German to serve the target audience effectively.
+
+## Recent Changes (July 9, 2025)
+
+- **Public URL Support**: Configured CORS to allow access from all domains for public link sharing
+- **API Reliability**: Enhanced error handling for better user experience when accessing shared links
+- **Network Robustness**: Improved timeout handling and more specific error messages
+- **Deployment Optimization**: Added environment-aware configuration for better public deployment
+- **Cross-Domain Compatibility**: Fixed JavaScript API calls to work with any domain (relative URLs)

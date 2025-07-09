@@ -48,7 +48,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show loading state
             showLoading();
             
-            const response = await fetch('/analyse', {
+            // Use relative URL that works with any domain
+            const response = await fetch('./analyse', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -56,12 +57,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({ text: text })
             });
 
+            // Check if response is ok
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: 'Unbekannter Fehler' }));
+                showError(errorData.error || `HTTP Fehler: ${response.status}`);
+                return;
+            }
+
             const data = await response.json();
 
-            if (response.ok) {
+            if (data.antwort) {
                 showResults(data.antwort);
             } else {
-                showError(data.error || 'Ein Fehler ist aufgetreten.');
+                showError(data.error || 'Keine Antwort vom Server erhalten.');
             }
         } catch (error) {
             console.error('Network error:', error);

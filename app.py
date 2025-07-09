@@ -8,9 +8,22 @@ from google.genai import types
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
+# Environment configuration
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
+DEBUG_MODE = ENVIRONMENT == "development"
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "fallback-secret-key")
-CORS(app)
+
+# Configure CORS for all domains to allow public access
+CORS(app, resources={
+    r"/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": False
+    }
+})
 
 # Initialize Gemini client
 client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", "your-api-key-here"))
@@ -20,11 +33,18 @@ def index():
     """Render the main page"""
     return render_template("index.html")
 
-@app.route("/analyse", methods=["POST"])
+@app.route("/analyse", methods=["POST", "OPTIONS"])
 def analyse():
     """Analyze user text for spiritual self-reflection using Gemini AI"""
+    # Handle preflight requests
+    if request.method == "OPTIONS":
+        return jsonify({"status": "ok"}), 200
+    
     try:
         data = request.json
+        if not data:
+            return jsonify({"error": "Keine Daten empfangen."}), 400
+            
         user_text = data.get("text", "")
         
         if not user_text.strip():
@@ -53,7 +73,8 @@ def analyse():
             config=types.GenerateContentConfig(
                 system_instruction=system_prompt,
                 temperature=0.7,
-                max_output_tokens=1000
+                max_output_tokens=1000,
+                candidate_count=1
             )
         )
 
@@ -64,7 +85,13 @@ def analyse():
 
     except Exception as e:
         logging.error(f"Error in analyse endpoint: {str(e)}")
-        return jsonify({"error": "Es gab ein Problem mit der Analyse. Bitte versuchen Sie es erneut."}), 500
+        # Return more specific error messages for debugging
+        error_message = "Es gab ein Problem mit der Analyse. Bitte versuchen Sie es erneut."
+        if "API" in str(e):
+            error_message = "Problem mit der AI-Verbindung. Bitte versuchen Sie es in einem Moment erneut."
+        elif "timeout" in str(e).lower():
+            error_message = "Die Anfrage dauerte zu lange. Bitte versuchen Sie es erneut."
+        return jsonify({"error": error_message}), 500
 
 @app.errorhandler(404)
 def not_found(error):
@@ -76,4 +103,4 @@ def internal_error(error):
     return jsonify({"error": "Ein interner Serverfehler ist aufgetreten."}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=DEBUG_MODE)
