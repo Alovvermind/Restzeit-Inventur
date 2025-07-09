@@ -135,3 +135,7 @@ The application is designed as a supportive tool for spiritual self-reflection, 
 - **Scrollable Results**: Analysis results now display in scrollable container with custom scrollbar
 - **Token Limit Handling**: Increased token limit to 2000 and improved handling of long responses
 - **Visual Scroll Hints**: Added indicators when analysis results are longer than visible area
+- **Network Robustness**: Added automatic retry logic (3 attempts) for failed connections
+- **Public WiFi Support**: Specific error handling for public networks (Penny, cafés) with helpful warnings
+- **Offline Detection**: Real-time network status monitoring with user-friendly error messages
+- **Progressive Timeouts**: Increased timeout to 45 seconds with progressive retry delays

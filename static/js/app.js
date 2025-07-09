@@ -8,6 +8,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const errorSection = document.getElementById('errorSection');
     const analysisResult = document.getElementById('analysisResult');
     const errorMessage = document.getElementById('errorMessage');
+    
+    // Add network status monitoring
+    function updateNetworkStatus() {
+        if (!navigator.onLine) {
+            showError('Keine Internetverbindung. Bitte überprüfen Sie Ihre Netzwerkverbindung.');
+            analyzeBtn.disabled = true;
+        } else {
+            analyzeBtn.disabled = false;
+        }
+    }
+    
+    // Listen for network changes
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
+    updateNetworkStatus(); // Initial check
 
     // Form submission handler
     form.addEventListener('submit', function(e) {
@@ -44,46 +59,85 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     async function analyzeText(text) {
-        try {
-            // Show loading state
-            showLoading();
-            
-            // Use relative URL that works with any domain
-            const response = await fetch('./analyse', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ text: text }),
-                // Add timeout and retry logic
-                signal: AbortSignal.timeout(30000) // 30 second timeout
-            });
+        const maxRetries = 3;
+        let retryCount = 0;
+        
+        while (retryCount < maxRetries) {
+            try {
+                // Show loading state
+                showLoading();
+                
+                // Check if online
+                if (!navigator.onLine) {
+                    showError('Keine Internetverbindung. Bitte überprüfen Sie Ihre Netzwerkverbindung.');
+                    return;
+                }
+                
+                // Use relative URL that works with any domain
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout
+                
+                const response = await fetch('./analyse', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text }),
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
 
-            // Check if response is ok
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ error: 'Unbekannter Fehler' }));
-                showError(errorData.error || `HTTP Fehler: ${response.status}`);
-                return;
-            }
+                // Check if response is ok
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ error: 'Unbekannter Fehler' }));
+                    
+                    // If it's a server error (5xx), try again
+                    if (response.status >= 500 && retryCount < maxRetries - 1) {
+                        retryCount++;
+                        updateLoadingMessage(`Versuch ${retryCount + 1} von ${maxRetries}...`);
+                        await new Promise(resolve => setTimeout(resolve, 2000 * retryCount)); // Progressive delay
+                        continue;
+                    }
+                    
+                    showError(errorData.error || `HTTP Fehler: ${response.status}`);
+                    return;
+                }
 
-            const data = await response.json();
+                const data = await response.json();
 
-            if (data.antwort) {
-                showResults(data.antwort);
-            } else {
-                showError(data.error || 'Keine Antwort vom Server erhalten.');
+                if (data.antwort) {
+                    showResults(data.antwort);
+                    return; // Success, exit retry loop
+                } else {
+                    showError(data.error || 'Keine Antwort vom Server erhalten.');
+                    return;
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                
+                // If it's a network error and we have retries left, try again
+                if ((error.name === 'AbortError' || error.name === 'TypeError' || error.name === 'NetworkError') && retryCount < maxRetries - 1) {
+                    retryCount++;
+                    updateLoadingMessage(`Netzwerkfehler. Versuch ${retryCount + 1} von ${maxRetries}...`);
+                    await new Promise(resolve => setTimeout(resolve, 3000 * retryCount)); // Progressive delay
+                    continue;
+                }
+                
+                // Final error after all retries
+                if (error.name === 'AbortError') {
+                    showError('Die Anfrage hat zu lange gedauert. Öffentliche WLAN-Netzwerke blockieren manchmal solche Anfragen. Versuchen Sie es mit einem anderen Netzwerk.');
+                    showNetworkWarning();
+                } else if (error.name === 'TypeError' || error.name === 'NetworkError') {
+                    showError('Netzwerkfehler. Öffentliche WLAN-Netzwerke (wie bei Penny) blockieren oft solche Anfragen. Versuchen Sie es mit mobilem Internet oder einem anderen WLAN.');
+                    showNetworkWarning();
+                } else {
+                    showError('Verbindungsfehler. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.');
+                }
+                break; // Exit retry loop on final error
+            } finally {
+                hideLoading();
             }
-        } catch (error) {
-            console.error('Network error:', error);
-            if (error.name === 'AbortError') {
-                showError('Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.');
-            } else if (error.name === 'TypeError') {
-                showError('Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.');
-            } else {
-                showError('Verbindungsfehler. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.');
-            }
-        } finally {
-            hideLoading();
         }
     }
 
@@ -93,6 +147,21 @@ document.addEventListener('DOMContentLoaded', function() {
         errorSection.style.display = 'none';
         analyzeBtn.disabled = true;
         analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analysiere...';
+    }
+    
+    function updateLoadingMessage(message) {
+        analyzeBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i>${message}`;
+    }
+    
+    function showNetworkWarning() {
+        const networkWarning = document.getElementById('networkWarning');
+        if (networkWarning) {
+            networkWarning.style.display = 'block';
+            // Hide warning after 10 seconds
+            setTimeout(() => {
+                networkWarning.style.display = 'none';
+            }, 10000);
+        }
     }
 
     function hideLoading() {
