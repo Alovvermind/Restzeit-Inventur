@@ -1,4 +1,42 @@
 <!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Spirituelle Inventur</title>
+    <style>
+        body { background:#111; color:#eee; font-family:sans-serif; padding:20px; }
+        textarea { width:100%; height:200px; background:#222; color:#fff; border:1px solid #444; padding:10px; }
+        button { margin-top:10px; padding:10px; background:#f0c040; border:none; color:#000; font-weight:bold; }
+        #antwort { margin-top:20px; padding:10px; background:#222; border-left:4px solid #f0c040; }
+    </style>
+</head>
+<body>
+    <h1>Spirituelle Inventur</h1>
+    <p>Schreib hier deinen Text zur Selbstreflexion:</p>
+    <textarea id="text"></textarea><br>
+    <button onclick="senden()">Analyse starten</button>
+    <div id="antwort" style="display:none;"></div>
+    <script>
+        async function senden() {
+            const text = document.getElementById("text").value;
+            const antwortDiv = document.getElementById("antwort");
+            antwortDiv.style.display = "block";
+            antwortDiv.innerHTML = "Bitte warten...";
+
+            const res = await fetch("/analyse", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text })
+            });
+
+            const result = await res.json();
+            antwortDiv.innerHTML = result.antwort
+                ? "<b>Antwort:</b><br>" + result.antwort.replace(/\n/g, "<br>")
+                : "<span style='color:red;'>" + (result.error || "Fehler") + "</span>";
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
 <html lang="de" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
