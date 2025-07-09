@@ -19,8 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        if (text.length < 10) {
-            showError('Bitte geben Sie einen ausführlicheren Text ein (mindestens 10 Zeichen).');
+        if (text.length < 5) {
+            showError('Bitte geben Sie einen Text für die Analyse ein.');
             return;
         }
 
@@ -105,6 +105,16 @@ document.addEventListener('DOMContentLoaded', function() {
         analysisResult.innerHTML = formatAnalysisResult(result);
         resultsSection.style.display = 'block';
         errorSection.style.display = 'none';
+        
+        // Check if content is scrollable and show hint
+        const scrollHint = document.getElementById('scrollHint');
+        setTimeout(() => {
+            if (analysisResult.scrollHeight > analysisResult.clientHeight) {
+                scrollHint.style.display = 'block';
+            } else {
+                scrollHint.style.display = 'none';
+            }
+        }, 100);
         
         // Smooth scroll to results
         resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });

@@ -131,3 +131,7 @@ The application is designed as a supportive tool for spiritual self-reflection, 
 - **Data Persistence**: All successful analyses are now stored with timestamps and metadata
 - **Admin Analytics**: Added `/admin/stats` endpoint for monitoring application usage
 - **Privacy Protection**: History endpoint shows only basic stats without exposing user content
+- **Spelling Error Support**: AI now processes text with spelling/grammar errors without blocking
+- **Scrollable Results**: Analysis results now display in scrollable container with custom scrollbar
+- **Token Limit Handling**: Increased token limit to 2000 and improved handling of long responses
+- **Visual Scroll Hints**: Added indicators when analysis results are longer than visible area

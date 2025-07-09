@@ -90,6 +90,8 @@ def analyse():
         Danach gibst du eine kurze, direkte Einschätzung ab und schlägst einen konkreten Tagesvorsatz vor, der zur spirituellen Entwicklung beiträgt.
         Sprich in klarer, menschlicher Sprache. Sei ehrlich, aber niemals überheblich. Der Nutzer soll sich gesehen und angesprochen fühlen.
         
+        WICHTIG: Ignoriere Rechtschreibfehler und Grammatikfehler vollständig. Konzentriere dich nur auf den emotionalen Inhalt und die Bedeutung des Textes.
+        
         Strukturiere deine Antwort wie folgt:
         1. Eine kurze, einfühlsame Einschätzung der erkannten Charakterdefizite
         2. Eine konkrete, umsetzbare Empfehlung für den heutigen Tag
@@ -106,12 +108,12 @@ def analyse():
             config=types.GenerateContentConfig(
                 system_instruction=system_prompt,
                 temperature=0.7,
-                max_output_tokens=1000,
+                max_output_tokens=2000,
                 candidate_count=1
             )
         )
 
-        if response.text:
+        if response and response.text:
             # Save successful analysis to database
             try:
                 reflection = ReflectionSession(
@@ -130,7 +132,21 @@ def analyse():
                 # Continue despite database error
             
             return jsonify({"antwort": response.text})
+        elif response and hasattr(response, 'candidates') and response.candidates:
+            # Handle blocked content, safety filters, or MAX_TOKENS
+            candidate = response.candidates[0]
+            if hasattr(candidate, 'finish_reason') and candidate.finish_reason.name == 'MAX_TOKENS':
+                # If response was cut off due to max tokens, still try to use the partial response
+                if candidate.content and candidate.content.parts:
+                    partial_text = candidate.content.parts[0].text
+                    if partial_text:
+                        logging.warning(f"Response truncated due to MAX_TOKENS, using partial response")
+                        return jsonify({"antwort": partial_text + "\n\n[Antwort wurde aufgrund der Länge gekürzt]"})
+                
+            logging.warning(f"Response blocked or filtered: {response}")
+            return jsonify({"error": "Der Text konnte aus Sicherheitsgründen nicht analysiert werden. Bitte versuchen Sie es mit anderem Text."}), 400
         else:
+            logging.error(f"No response from AI: {response}")
             return jsonify({"error": "Die Analyse konnte nicht durchgeführt werden. Bitte versuchen Sie es erneut."}), 500
 
     except Exception as e:

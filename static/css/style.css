@@ -8,6 +8,32 @@ body {
     white-space: pre-wrap;
     line-height: 1.8;
     font-size: 1.1rem;
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 1.5rem;
+    border: 1px solid rgba(var(--bs-light-rgb), 0.1);
+    border-radius: 8px;
+    background-color: rgba(var(--bs-dark-rgb), 0.3);
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for analysis results */
+.analysis-result::-webkit-scrollbar {
+    width: 8px;
+}
+
+.analysis-result::-webkit-scrollbar-track {
+    background: rgba(var(--bs-dark-rgb), 0.1);
+    border-radius: 4px;
+}
+
+.analysis-result::-webkit-scrollbar-thumb {
+    background: rgba(var(--bs-primary-rgb), 0.6);
+    border-radius: 4px;
+}
+
+.analysis-result::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--bs-primary-rgb), 0.8);
 }
 
 .analysis-result p {
