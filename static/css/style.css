@@ -1,0 +1,115 @@
+/* Custom styles for spiritual reflection app */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+}
+
+.analysis-result {
+    white-space: pre-wrap;
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.analysis-result p {
+    margin-bottom: 1.5rem;
+}
+
+/* Smooth transitions */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Button enhancements */
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Form enhancements */
+textarea.form-control {
+    resize: vertical;
+    min-height: 150px;
+}
+
+textarea.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Loading animation */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.loading-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .display-5 {
+        font-size: 2rem;
+    }
+    
+    .lead {
+        font-size: 1.1rem;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+/* Alert enhancements */
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+.alert-info {
+    background-color: rgba(var(--bs-info-rgb), 0.1);
+    color: var(--bs-info);
+}
+
+.alert-danger {
+    background-color: rgba(var(--bs-danger-rgb), 0.1);
+    color: var(--bs-danger);
+}
+
+/* Card enhancements */
+.card {
+    border-radius: 15px;
+    border: 1px solid rgba(var(--bs-light-rgb), 0.1);
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    border-bottom: 1px solid rgba(var(--bs-light-rgb), 0.1);
+}
+
+/* Icon styling */
+.fa-heart {
+    color: var(--bs-info);
+}
+
+.text-info {
+    color: var(--bs-info) !important;
+}
+
+/* Spinner enhancement */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
