@@ -54,7 +54,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ text: text })
+                body: JSON.stringify({ text: text }),
+                // Add timeout and retry logic
+                signal: AbortSignal.timeout(30000) // 30 second timeout
             });
 
             // Check if response is ok
@@ -73,7 +75,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Network error:', error);
-            showError('Verbindungsfehler. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.');
+            if (error.name === 'AbortError') {
+                showError('Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.');
+            } else if (error.name === 'TypeError') {
+                showError('Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.');
+            } else {
+                showError('Verbindungsfehler. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.');
+            }
         } finally {
             hideLoading();
         }

@@ -65,9 +65,13 @@ def index():
 @app.route("/analyse", methods=["POST", "OPTIONS"])
 def analyse():
     """Analyze user text for spiritual self-reflection using Gemini AI"""
-    # Handle preflight requests
+    # Handle preflight requests for CORS
     if request.method == "OPTIONS":
-        return jsonify({"status": "ok"}), 200
+        response = jsonify({"status": "ok"})
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add("Access-Control-Allow-Headers", "Content-Type")
+        response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
+        return response, 200
     
     try:
         data = request.json
