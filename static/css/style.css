@@ -1,16 +1,11 @@
-body {
-    background-color: #121212;
-    color: #f8f9fa;
-}
-.card {
-    background-color: #1f1f1f;
-    border: 1px solid #333;
-}
-textarea.form-control {
-    background-color: #252525;
-    color: #eee;
-    border: 1px solid #444;
-}
 .analysis-result {
     white-space: pre-wrap;
+    background-color: #181818;
+    border-left: 4px solid #f0c040;
+    padding: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+    color: white;
+    font-size: 1rem;
+    line-height: 1.6;
 }
