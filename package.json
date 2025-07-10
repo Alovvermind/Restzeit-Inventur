@@ -1,7 +1,7 @@
 {
   "name": "tagesinventur-nach-12-schritte-art",
-  "private": true,
   "version": "0.0.1",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -17,7 +17,7 @@
     "@vitejs/plugin-react": "^4.0.0"
   },
   "devDependencies": {
-    "typescript": "~5.7.2",
-    "@types/node": "^22.14.0"
+    "@types/node": "^22.14.0",
+    "typescript": "~5.7.2"
   }
 }
