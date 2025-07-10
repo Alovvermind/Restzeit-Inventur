@@ -1,5 +1,0 @@
-flask
-gunicorn
-flask-cors
-flask_sqlalchemy
-google-genai
