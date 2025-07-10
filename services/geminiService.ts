@@ -1,10 +1,10 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import type { Analysis } from '../types';
 
-const API_KEY = process.env.API_KEY;
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 if (!API_KEY) {
-  throw new Error("API_KEY is not set in environment variables.");
+  throw new Error("VITE_GEMINI_API_KEY is not set in environment variables.");
 }
 
 const ai = new GoogleGenAI({ apiKey: API_KEY });
@@ -34,7 +34,7 @@ const responseSchema = {
             type: Type.ARRAY,
             description: "Ein oder zwei kurze, wörtliche Zitate oder sehr enge Paraphrasen aus dem Text des Nutzers, die dieses Muster konkret belegen.",
             items: {
-                type: Type.STRING,
+              type: Type.STRING,
             }
           }
         },
@@ -76,7 +76,7 @@ export async function analyzeInventory(inventoryText: string): Promise<Analysis>
   } catch (error) {
     console.error("Error calling Gemini API:", error);
     if (error instanceof Error) {
-        throw new Error(`Fehler bei der Analyse: ${error.message}. Bitte versuche es später erneut.`);
+      throw new Error(`Fehler bei der Analyse: ${error.message}. Bitte versuche es später erneut.`);
     }
     throw new Error("Ein unbekannter Fehler ist bei der Analyse aufgetreten.");
   }
