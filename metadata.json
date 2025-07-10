@@ -1,5 +1,5 @@
 {
   "name": "Tagesinventur nach 12-Schritte-Art",
-  "description": "Eine Webanwendung, die Benutzern hilft, eine tägliche Inventur im Stil von 12-Schritte-Programmen durchzuführen, Charakterdefizite zu analysieren und tägliche Vorsätze zu erhalten.",
-  "requestFramePermissions": []
-}
+  "version": "1.0.0",
+  "author": "Restzeit",
+  "description": "Diese Webanwendung unterstützt Menschen dabei, täglich Inventur zu machen – basierend auf den Prinzipien der 12-Schritte-Programme."
