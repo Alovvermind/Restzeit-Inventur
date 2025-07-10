@@ -1,90 +1,58 @@
-# app.py
-
-# Benötigte Bibliotheken importieren (fügen Sie hier Ihre eigenen hinzu)
-from flask import Flask, jsonify
 import os
+import logging
+from flask import Flask, request, jsonify, render_template, session
+from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
 
-# Die Flask-Anwendung erstellen.
-# Der Befehl 'gunicorn app:app' sucht standardmäßig nach diesem 'app'-Objekt.
+logging.basicConfig(level=logging.DEBUG)
+
 app = Flask(__name__)
+app.secret_key = os.environ.get("SESSION_SECRET", "fallback-secret-key")
 
-# =========================================================================
-# Hier könnten Ihre Konfigurationen, Hilfsfunktionen oder Variablen stehen.
-# Ich füge hier Platzhaltercode hinzu, um die Zeilennummern aus Ihrem
-# Fehlerprotokoll realistischer zu machen.
-# =========================================================================
+# Datenbank konfigurieren
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///database.db")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-def lade_einstellungen():
-    """Eine Beispielfunktion, um Einstellungen zu laden."""
-    print("Anwendungseinstellungen werden geladen...")
-    return {
-        "version": "1.0.0",
-        "umgebung": os.environ.get("FLASK_ENV", "production")
-    }
+db = SQLAlchemy(app)
 
-EINSTELLUNGEN = lade_einstellungen()
+# CORS erlauben (optional, falls nötig)
+CORS(app)
 
-# ...
-# ... Stellen Sie sich hier viele weitere Codezeilen vor ...
-# ... um ungefähr auf die Zeilennummer Ihres Fehlers zu kommen.
-# ...
-# ...
-# ...
-# ...
-# ...
+# Beispiel Model (nur minimal)
+class ReflectionSession(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_text = db.Column(db.Text, nullable=False)
+    ai_analysis = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, server_default=db.func.now())
 
-# --------------------------------------------------------------------------
-# HIER IST DIE KORREKTUR FÜR IHREN FEHLER
-#
-# Ihr Fehler "SyntaxError: unterminated triple-quoted string literal"
-# bedeutet, dass ein mehrzeiliger String mit """ begonnen, aber
-# nicht wieder mit """ beendet wurde.
-#
-# Der folgende Code zeigt die korrekte Schreibweise.
-# --------------------------------------------------------------------------
+with app.app_context():
+    db.create_all()
+    logging.info("DB-Tabelle erstellt")
 
-# Dies ist ein mehrzeiliger String, der das Verhalten für ein KI-Modell oder
-# einen anderen Zweck definieren könnte.
-# Er MUSS mit den gleichen Anführungszeichen geschlossen werden, mit denen er begonnen hat.
-system_prompt = """
-Dies ist der Anfang eines mehrzeiligen Textes.
-Sie können hier so viele Zeilen schreiben, wie Sie möchten.
+@app.route("/")
+def index():
+    return render_template("index.html")
 
-Zum Beispiel:
-- Ein Punkt auf einer Liste.
-- Ein weiterer Punkt.
+@app.route("/analyse", methods=["POST"])
+def analyse():
+    data = request.json
+    user_text = data.get("text", "").strip()
+    if not user_text:
+        return jsonify({"error": "Bitte Text eingeben."}), 400
 
-Stellen Sie einfach sicher, dass der Textblock korrekt endet.
-"""  # <-- DAS IST DIE KORREKTUR. Die schließenden drei Anführungszeichen wurden hier hinzugefügt.
+    # Simulierter AI-Antworttext
+    antwort = f"Analyse des Textes:\n\n{user_text[:100]}..."
 
+    # Speichern in DB (optional)
+    try:
+        session_entry = ReflectionSession(user_text=user_text, ai_analysis=antwort)
+        db.session.add(session_entry)
+        db.session.commit()
+    except Exception as e:
+        logging.error(f"DB Fehler: {e}")
 
-# =========================================================================
-# Hier definieren Sie die Routen (Pfade) Ihrer Webanwendung.
-# Zum Beispiel: was passiert, wenn jemand Ihre Webseite besucht.
-# =========================================================================
+    return jsonify({"antwort": antwort})
 
-@app.route('/')
-def startseite():
-    """Die Hauptroute, die anzeigt, dass die App läuft."""
-    # Sie können diesen HTML-Text nach Belieben ändern.
-    return "<h1>Bereitstellung erfolgreich!</h1><p>Ihre Anwendung läuft jetzt auf Render.</p>"
-
-@app.route('/api/info')
-def api_info():
-    """Eine Beispiel-API-Route, die einige Informationen zurückgibt."""
-    return jsonify({
-        "nachricht": "API ist betriebsbereit",
-        "system_prompt_beispiel": system_prompt,
-        "version": EINSTELLUNGEN["version"]
-    })
-
-# =========================================================================
-# Dieser Teil wird nur ausgeführt, wenn Sie die Datei direkt mit
-# 'python app.py' auf Ihrem lokalen Computer starten (nicht auf Render).
-# Das ist nützlich für Tests.
-# =========================================================================
-if __name__ == '__main__':
-    # Render stellt den Port über eine Umgebungsvariable bereit.
-    port = int(os.environ.get('PORT', 5000))
-    # 'host='0.0.0.0'' sorgt dafür, dass der Server von außen erreichbar ist.
-    app.run(host='0.0.0.0', port=port)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
