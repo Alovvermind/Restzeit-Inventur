@@ -1,7 +1,7 @@
 {
   "name": "tagesinventur-nach-12-schritte-art",
-  "version": "0.0.1",
   "private": true,
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
