@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Spirituelle Inventur</title>
     <style>
         body { background:#111; color:#eee; font-family:sans-serif; padding:20px; }
-        textarea { width:100%; height:200px; background:#222; color:#fff; border:1px solid #444; padding:10px; }
-        button { margin-top:10px; padding:10px; background:#f0c040; border:none; color:#000; font-weight:bold; }
-        #antwort { margin-top:20px; padding:10px; background:#222; border-left:4px solid #f0c040; }
+        textarea { width:100%; height:150px; background:#222; color:#fff; border:1px solid #444; padding:10px; }
+        button { margin-top:10px; padding:10px; background:#f0c040; border:none; color:#000; font-weight:bold; cursor:pointer; }
+        #antwort { margin-top:20px; padding:10px; background:#222; border-left:4px solid #f0c040; white-space: pre-wrap; }
     </style>
 </head>
 <body>
     <h1>Spirituelle Inventur</h1>
-    <p>Schreib hier deinen Text zur Selbstreflexion:</p>
-    <textarea id="text"></textarea><br>
+    <textarea id="text" placeholder="Schreibe hier deine Gedanken..."></textarea><br />
     <button onclick="senden()">Analyse starten</button>
     <div id="antwort" style="display:none;"></div>
+
     <script>
         async function senden() {
             const text = document.getElementById("text").value;
             const antwortDiv = document.getElementById("antwort");
             antwortDiv.style.display = "block";
-            antwortDiv.innerHTML = "Bitte warten...";
+            antwortDiv.textContent = "Bitte warten...";
 
             const res = await fetch("/analyse", {
                 method: "POST",
@@ -30,226 +30,12 @@
             });
 
             const result = await res.json();
-            antwortDiv.innerHTML = result.antwort
-                ? "<b>Antwort:</b><br>" + result.antwort.replace(/\n/g, "<br>")
-                : "<span style='color:red;'>" + (result.error || "Fehler") + "</span>";
+            if (result.antwort) {
+                antwortDiv.innerHTML = "<b>Antwort:</b><br>" + result.antwort.replace(/\n/g, "<br>");
+            } else {
+                antwortDiv.innerHTML = "<span style='color:red;'>" + (result.error || "Fehler") + "</span>";
+            }
         }
     </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="de" data-bs-theme="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spirituelle Selbstreflexion - 4. Schritt</title>
-    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
-</head>
-<body>
-    <div class="container py-5">
-        <!-- Header -->
-        <div class="row justify-content-center mb-5">
-            <div class="col-md-10 col-lg-8">
-                <div class="text-center">
-                    <div class="mb-4">
-                        <i class="fas fa-heart text-info fa-3x"></i>
-                    </div>
-                    <h1 class="display-5 mb-3">Spirituelle Selbstreflexion</h1>
-                    <p class="lead text-muted">Ein Werkzeug für die ehrliche Inventur im Sinne des 4. Schritts der Anonymen Alkoholiker</p>
-                    <div class="alert alert-info" role="alert">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Teilen Sie Ihre Gedanken und Gefühle mit. Erhalten Sie mitfühlende Einschätzungen und konkrete Tagesvorsätze für Ihre spirituelle Entwicklung.
-                    </div>
-                    <div class="alert alert-warning" role="alert" id="networkWarning" style="display: none;">
-                        <i class="fas fa-wifi me-2"></i>
-                        <strong>Netzwerkproblem:</strong> Öffentliche WLAN-Netzwerke (wie bei Penny, Cafés oder draußen) blockieren oft solche Anfragen. Verwenden Sie für beste Ergebnisse mobiles Internet oder ein privates WLAN.
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="row justify-content-center">
-            <div class="col-md-10 col-lg-8">
-                <!-- Guided Prompts Section -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="fas fa-compass me-2"></i>
-                            Geführte Reflexion
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-muted mb-3">Wählen Sie ein Charakterdefizit aus, um gezielte Reflexionsfragen zu erhalten:</p>
-                        <div class="row g-2 mb-3">
-                            <div class="col-md-4">
-                                <button class="btn btn-outline-info w-100 defect-btn" data-defect="pride">
-                                    <i class="fas fa-crown me-2"></i>Stolz
-                                </button>
-                            </div>
-                            <div class="col-md-4">
-                                <button class="btn btn-outline-danger w-100 defect-btn" data-defect="resentment">
-                                    <i class="fas fa-fire me-2"></i>Groll
-                                </button>
-                            </div>
-                            <div class="col-md-4">
-                                <button class="btn btn-outline-warning w-100 defect-btn" data-defect="fear">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>Angst
-                                </button>
-                            </div>
-                            <div class="col-md-4">
-                                <button class="btn btn-outline-success w-100 defect-btn" data-defect="control">
-                                    <i class="fas fa-hand-paper me-2"></i>Kontrolle
-                                </button>
-                            </div>
-                            <div class="col-md-4">
-                                <button class="btn btn-outline-secondary w-100 defect-btn" data-defect="jealousy">
-                                    <i class="fas fa-heart-broken me-2"></i>Eifersucht
-                                </button>
-                            </div>
-                            <div class="col-md-4">
-                                <button class="btn btn-outline-primary w-100 defect-btn" data-defect="dishonesty">
-                                    <i class="fas fa-mask me-2"></i>Unehrlichkeit
-                                </button>
-                            </div>
-                        </div>
-                        <div id="guidedPrompts" class="alert alert-light" style="display: none;">
-                            <h6 class="mb-3"><i class="fas fa-question-circle me-2"></i>Reflexionsfragen:</h6>
-                            <div id="promptQuestions"></div>
-                            <button class="btn btn-sm btn-outline-primary mt-2" onclick="useGuidedPrompt()">
-                                <i class="fas fa-arrow-down me-1"></i>In Textfeld übernehmen
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Input Section -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="fas fa-pen-alt me-2"></i>
-                            Ihre Reflexion
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <form id="reflectionForm">
-                            <div class="mb-3">
-                                <label for="reflectionText" class="form-label">
-                                    Beschreiben Sie Ihre Gedanken, Gefühle oder eine Situation, die Sie beschäftigt:
-                                </label>
-                                <textarea 
-                                    class="form-control" 
-                                    id="reflectionText" 
-                                    name="text" 
-                                    rows="8" 
-                                    placeholder="Schreiben Sie hier über Ihre Erfahrungen, Ängste, Groll oder andere Gefühle, die Sie bewegen. Seien Sie ehrlich mit sich selbst..."
-                                    required
-                                ></textarea>
-                                <div class="form-text">
-                                    Ihre Eingabe wird vertraulich behandelt und nur für die Analyse verwendet.
-                                </div>
-                            </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg" id="analyzeBtn">
-                                    <i class="fas fa-search me-2"></i>
-                                    Analyse durchführen
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Loading Indicator -->
-                <div id="loadingIndicator" class="text-center mb-4" style="display: none;">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Wird analysiert...</span>
-                    </div>
-                    <p class="mt-3 text-muted">Ihre Reflexion wird analysiert...</p>
-                </div>
-
-                <!-- Results Section -->
-                <div id="resultsSection" class="card" style="display: none;">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="fas fa-lightbulb me-2"></i>
-                            Spirituelle Einschätzung
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="analysisResult" class="analysis-result"></div>
-                        <div class="text-muted small mt-2" id="scrollHint" style="display: none;">
-                            <i class="fas fa-arrow-down me-1"></i>
-                            Scrollen Sie nach unten, um den vollständigen Text zu lesen
-                        </div>
-                        <div class="mt-3">
-                            <button class="btn btn-outline-secondary" onclick="startNewReflection()">
-                                <i class="fas fa-plus me-2"></i>
-                                Neue Reflexion
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Error Section -->
-                <div id="errorSection" class="alert alert-danger" style="display: none;">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <span id="errorMessage"></span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Donation Section -->
-        <div class="row justify-content-center mt-5">
-            <div class="col-md-10 col-lg-8">
-                <div class="card donation-card">
-                    <div class="card-header text-center">
-                        <h5 class="card-title mb-0">
-                            <i class="fas fa-heart text-danger me-2"></i>
-                            Unterstützen Sie dieses Projekt
-                        </h5>
-                    </div>
-                    <div class="card-body text-center">
-                        <p class="text-muted mb-4">
-                            Wenn Ihnen diese App bei Ihrer spirituellen Reise geholfen hat, können Sie den Entwickler gerne mit einer kleinen Spende unterstützen.
-                        </p>
-                        <div class="donation-qr-container">
-                            <img src="{{ url_for('static', filename='images/paypal_qr.jpg') }}" 
-                                 alt="PayPal Trinkgeld QR-Code" 
-                                 class="paypal-qr-code img-fluid">
-                            <div class="mt-3">
-                                <h6 class="text-info">Trinkgeldkasse</h6>
-                                <p class="small text-muted">
-                                    <i class="fas fa-mobile-alt me-1"></i>
-                                    QR-Code mit dem Handy scannen
-                                </p>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <small class="text-muted">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Ihre Spende hilft bei der Weiterentwicklung und dem Betrieb dieser App
-                            </small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="row justify-content-center mt-4">
-            <div class="col-md-10 col-lg-8">
-                <div class="text-center text-muted">
-                    <small>
-                        <i class="fas fa-shield-alt me-1"></i>
-                        Dieses Werkzeug dient der spirituellen Selbstreflexion und ersetzt keine professionelle Beratung.
-                    </small>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
